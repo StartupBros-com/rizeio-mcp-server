@@ -20,7 +20,7 @@
     "inspector": "npx @modelcontextprotocol/inspector dist/index.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.15.1",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "date-fns": "^2.30.0",
     "dotenv": "^17.2.0",
     "graphql": "^16.11.0",
