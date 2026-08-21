@@ -34,23 +34,18 @@ export function formatDateTime(dateString: string): string {
   );
 }
 
-// Converte formato Rize.io "2025-09-05 04:00:00 +0200" in ISO 8601 "2025-09-05T04:00:00+02:00"
+// Normalize Rize timestamps such as "2025-09-05 04:00:00 +0200"
+// into ISO 8601 form: "2025-09-05T04:00:00+02:00".
 function convertRizeDateToISO(dateString: string): string {
   if (!dateString || typeof dateString !== 'string') {
     throw new Error('Invalid date string');
   }
 
-  // Formato Rize.io: "2025-09-05 04:00:00 +0200"
-  // Formato ISO: "2025-09-05T04:00:00+02:00"
-
-  // Sostituisci spazio con T
-  let isoDate = dateString.replace(' ', 'T');
-
-  // Se c'è un timezone offset come "+0200", sostituiscilo con "+02:00"
-  // Regex: cattura il segno (+ o -) e le 4 cifre del timezone
-  isoDate = isoDate.replace(/([+-])(\d{2})(\d{2})$/, '$1$2:$3');
-
-  return isoDate;
+  return dateString
+    .trim()
+    .replace(/^(\d{4}-\d{2}-\d{2})\s+/, '$1T')
+    .replace(/\s*([+-])(\d{2}):?(\d{2})$/, '$1$2:$3')
+    .replace(/\s+Z$/, 'Z');
 }
 
 export function formatProductivityMetrics(metrics: RizeProductivityMetrics[]): string {
