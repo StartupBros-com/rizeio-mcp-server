@@ -10,22 +10,28 @@ export function formatDuration(minutes: number): string {
   return `${mins}m`;
 }
 
-export function formatDate(dateString: string): string {
+function formatRizeDate(
+  dateString: string,
+  pattern: string,
+  fallback: string
+): string {
   try {
-    const isoDate = convertRizeDateToISO(dateString);
-    return format(parseISO(isoDate), 'yyyy-MM-dd');
-  } catch (error) {
-    return 'Invalid Date';
+    return format(parseISO(convertRizeDateToISO(dateString)), pattern);
+  } catch {
+    return fallback;
   }
 }
 
+export function formatDate(dateString: string): string {
+  return formatRizeDate(dateString, 'yyyy-MM-dd', 'Invalid Date');
+}
+
 export function formatDateTime(dateString: string): string {
-  try {
-    const isoDate = convertRizeDateToISO(dateString);
-    return format(parseISO(isoDate), 'yyyy-MM-dd HH:mm:ss');
-  } catch (error) {
-    return 'Invalid DateTime';
-  }
+  return formatRizeDate(
+    dateString,
+    'yyyy-MM-dd HH:mm:ss',
+    'Invalid DateTime'
+  );
 }
 
 // Converte formato Rize.io "2025-09-05 04:00:00 +0200" in ISO 8601 "2025-09-05T04:00:00+02:00"
