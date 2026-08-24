@@ -11,6 +11,8 @@ import { formatProductivityMetrics, formatFocusSessions, formatAnalytics, format
 import { AuthenticationError } from './utils/errors.js';
 import { createLogger, format, transports } from 'winston';
 
+const SERVER_VERSION = '1.0.0';
+
 const config = loadConfig();
 
 const logger = createLogger({
@@ -28,9 +30,16 @@ const logger = createLogger({
 
 const rizeApi = new RizeApiService(config.apiKey);
 
+function textContent(text: string) {
+  return [{
+    type: 'text' as const,
+    text
+  }];
+}
+
 const server = new McpServer({
   name: 'rize-mcp-server',
-  version: '1.0.0'
+  version: SERVER_VERSION
 });
 
 server.tool(
@@ -42,10 +51,7 @@ server.tool(
     try {
       const user = await rizeApi.getCurrentUser();
       return {
-        content: [{
-          type: 'text',
-          text: `👤 Current User: ${user.email}${user.name ? ` (${user.name})` : ''}`
-        }]
+        content: textContent(`👤 Current User: ${user.email}${user.name ? ` (${user.name})` : ''}`)
       };
     } catch (error) {
       logger.error('Failed to get current user', { error: (error as Error).message });
@@ -72,10 +78,7 @@ server.tool(
       );
       logger.debug('Metrics retrieved', { count: metrics.length });
       return {
-        content: [{
-          type: 'text',
-          text: formatProductivityMetrics(metrics)
-        }]
+        content: textContent(formatProductivityMetrics(metrics))
       };
     } catch (error) {
       logger.error('Failed to get productivity metrics', { error: (error as Error).message, startDate, endDate, category });
@@ -103,10 +106,7 @@ server.tool(
         sessions = sessions.filter(session => (session.duration || 0) >= minDuration);
       }
       return {
-        content: [{
-          type: 'text',
-          text: formatFocusSessions(sessions)
-        }]
+        content: textContent(formatFocusSessions(sessions))
       };
     } catch (error) {
       logger.error('Failed to get focus sessions', { error: (error as Error).message, startDate, endDate, projectId, category });
@@ -126,10 +126,7 @@ server.tool(
       const validatedTimeframe = validateInput(TimeframeSchema, timeframe);
       const analytics = await rizeApi.getAnalytics(validatedTimeframe, includeInsights);
       return {
-        content: [{
-          type: 'text',
-          text: formatAnalytics(analytics)
-        }]
+        content: textContent(formatAnalytics(analytics))
       };
     } catch (error) {
       logger.error('Failed to get analytics report', { error: (error as Error).message, timeframe, includeInsights });
@@ -158,10 +155,7 @@ server.tool(
         formatted += `\n🔄 More projects available. Use cursor: ${result.nextCursor}`;
       }
       return {
-        content: [{
-          type: 'text',
-          text: formatted
-        }]
+        content: textContent(formatted)
       };
     } catch (error) {
       logger.error('Failed to list projects', { error: (error as Error).message, limit, cursor });
@@ -179,10 +173,7 @@ server.tool(
     try {
       const project = await rizeApi.createProject(name);
       return {
-        content: [{
-          type: 'text',
-          text: `✅ Project created successfully!\n\n📁 ${project.name}\n🆔 ID: ${project.id}\n📅 Created: ${new Date(project.createdAt).toLocaleDateString()}`
-        }]
+        content: textContent(`✅ Project created successfully!\n\n📁 ${project.name}\n🆔 ID: ${project.id}\n📅 Created: ${new Date(project.createdAt).toLocaleDateString()}`)
       };
     } catch (error) {
       logger.error('Failed to create project', { error: (error as Error).message, name });
@@ -204,10 +195,7 @@ server.tool(
       const sessions = await rizeApi.getFocusSessions(validatedDate);
       if (metrics.length === 0) {
         return {
-          content: [{
-            type: 'text',
-            text: `📅 No productivity data available for ${date}`
-          }],
+          content: textContent(`📅 No productivity data available for ${date}`),
           data: null
         };
       }
@@ -234,10 +222,7 @@ server.tool(
         });
       }
       return {
-        content: [{
-          type: 'text',
-          text: formatted
-        }],
+        content: textContent(formatted),
         data: {
           ...dayMetrics,
           sessionBreakdown: breakdown,
@@ -260,17 +245,11 @@ server.tool(
     try {
       await rizeApi.getCurrentUser();
       return {
-        content: [{
-          type: 'text',
-          text: `✅ Rize MCP Server Health Check\n\n🟢 Status: Healthy\n📅 Timestamp: ${new Date().toISOString()}\n🔑 API Connection: OK\n📊 Version: 1.0.0`
-        }]
+        content: textContent(`✅ Rize MCP Server Health Check\n\n🟢 Status: Healthy\n📅 Timestamp: ${new Date().toISOString()}\n🔑 API Connection: OK\n📊 Version: ${SERVER_VERSION}`)
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: `❌ Rize MCP Server Health Check\n\n🔴 Status: Unhealthy\n📅 Timestamp: ${new Date().toISOString()}\n❌ API Connection: Failed\n📝 Error: ${(error as Error).message}`
-        }]
+        content: textContent(`❌ Rize MCP Server Health Check\n\n🔴 Status: Unhealthy\n📅 Timestamp: ${new Date().toISOString()}\n❌ API Connection: Failed\n📝 Error: ${(error as Error).message}`)
       };
     }
   }
@@ -294,15 +273,15 @@ async function main() {
   }
 }
 
-process.on('SIGTERM', () => {
-  logger.info('Received SIGTERM, shutting down gracefully');
-  process.exit(0);
-});
+function registerShutdownHandler(signal: NodeJS.Signals) {
+  process.on(signal, () => {
+    logger.info(`Received ${signal}, shutting down gracefully`);
+    process.exit(0);
+  });
+}
 
-process.on('SIGINT', () => {
-  logger.info('Received SIGINT, shutting down gracefully');
-  process.exit(0);
-});
+registerShutdownHandler('SIGTERM');
+registerShutdownHandler('SIGINT');
 
 main().catch(error => {
   logger.error('Unhandled error', { error: (error as Error).message });
