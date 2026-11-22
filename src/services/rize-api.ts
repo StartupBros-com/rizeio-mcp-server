@@ -1,8 +1,12 @@
+import { format } from 'date-fns';
 import { GraphQLClient, gql } from 'graphql-request';
 import { RizeUser, RizeProject, RizeFocusSession, RizeProductivityMetrics, RizeAnalytics } from '../types/rize.js';
 import { AuthService } from './auth.js';
 import { CacheService } from './cache.js';
 // import { McpError } from '@modelcontextprotocol/sdk/types.js'; // Sostituire con errore custom se serve
+
+// Summary windows are calculated in the host's calendar, not UTC.
+const localDateKey = (date: Date): string => format(date, 'yyyy-MM-dd');
 
 export class RizeApiService {
   private client: GraphQLClient;
@@ -247,20 +251,19 @@ export class RizeApiService {
 
       switch (timeframe) {
         case 'day':
-          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString().split('T')[0];
-          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString().split('T')[0];
+          startDate = endDate = localDateKey(now);
           break;
         case 'week':
           const weekStart = new Date(now);
           weekStart.setDate(now.getDate() - now.getDay());
-          startDate = weekStart.toISOString().split('T')[0];
-          endDate = now.toISOString().split('T')[0];
+          startDate = localDateKey(weekStart);
+          endDate = localDateKey(now);
           break;
         case 'month':
           const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
           const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-          startDate = monthStart.toISOString().split('T')[0];
-          endDate = monthEnd.toISOString().split('T')[0];
+          startDate = localDateKey(monthStart);
+          endDate = localDateKey(monthEnd);
           break;
       }
 
