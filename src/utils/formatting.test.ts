@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { formatDate, formatDateTime } from './formatting.js';
+import { formatAnalytics, formatDate, formatDateTime } from './formatting.js';
 
 describe('Rize date formatting', () => {
   it('formats the documented Rize timestamp like its canonical ISO equivalent', () => {
@@ -22,4 +22,26 @@ describe('Rize date formatting', () => {
     expect(formatDate('not-a-date')).toBe('Invalid Date');
     expect(formatDateTime('not-a-date')).toBe('Invalid DateTime');
   });
+});
+
+describe('Rize analytics trend formatting', () => {
+  it.each([
+    [0.1264, -0.06, 0.7, '+12.6%', '-6.0%', '70.0%'],
+    [-0.0001, 0.0001, 0.62, '-0.0%', '+0.0%', '62.0%'],
+    [-0, 0, -0, '0.0%', '0.0%', '0.0%'],
+  ])('formats relative trends %s and %s with the original signs',
+    (focusTime, productivityScore, consistency, focus, score, stable) => {
+      expect(formatAnalytics({
+        timeframe: 'week',
+        trends: { focusTime, productivityScore, consistency },
+        insights: [],
+        metrics: [],
+      })).toBe([
+        '📈 Analytics Report (week)', '', '🔄 Trends:',
+        `• Focus Time: ${focus}`,
+        `• Productivity Score: ${score}`,
+        `• Consistency: ${stable}`, '', '',
+      ].join('\n'));
+    }
+  );
 });
