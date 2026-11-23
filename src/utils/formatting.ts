@@ -90,12 +90,16 @@ export function formatFocusSessions(sessions: RizeFocusSession[]): string {
   return formatted;
 }
 
+function formatPercentageDelta(value: number): string {
+  return `${value > 0 ? '+' : ''}${(value * 100).toFixed(1)}%`;
+}
+
 export function formatAnalytics(analytics: RizeAnalytics): string {
   let formatted = `📈 Analytics Report (${analytics.timeframe})\n\n`;
   // Trends
   formatted += `🔄 Trends:\n`;
-  formatted += `• Focus Time: ${analytics.trends.focusTime > 0 ? '+' : ''}${(analytics.trends.focusTime * 100).toFixed(1)}%\n`;
-  formatted += `• Productivity Score: ${analytics.trends.productivityScore > 0 ? '+' : ''}${(analytics.trends.productivityScore * 100).toFixed(1)}%\n`;
+  formatted += `• Focus Time: ${formatPercentageDelta(analytics.trends.focusTime)}\n`;
+  formatted += `• Productivity Score: ${formatPercentageDelta(analytics.trends.productivityScore)}\n`;
   formatted += `• Consistency: ${(analytics.trends.consistency * 100).toFixed(1)}%\n\n`;
   // Key Insights
   if (analytics.insights.length > 0) {
