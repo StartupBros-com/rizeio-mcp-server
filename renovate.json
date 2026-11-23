@@ -1,0 +1,7 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "This repository is a fork, and the fleet's Renovate run (StartupBros-com/home-infrastructure, renovate-config.js) skips a fork unless its renovate.json sets forkProcessing. That run sets the schedule, PR limits, release-age floors and automerge."
+  ],
+  "forkProcessing": "enabled"
+}
