@@ -92,11 +92,6 @@ export function formatFocusSessions(sessions: RizeFocusSession[]): string {
 
 export function formatAnalytics(analytics: RizeAnalytics): string {
   let formatted = `📈 Analytics Report (${analytics.timeframe})\n\n`;
-  // Trends
-  formatted += `🔄 Trends:\n`;
-  formatted += `• Focus Time: ${analytics.trends.focusTime > 0 ? '+' : ''}${(analytics.trends.focusTime * 100).toFixed(1)}%\n`;
-  formatted += `• Productivity Score: ${analytics.trends.productivityScore > 0 ? '+' : ''}${(analytics.trends.productivityScore * 100).toFixed(1)}%\n`;
-  formatted += `• Consistency: ${(analytics.trends.consistency * 100).toFixed(1)}%\n\n`;
   // Key Insights
   if (analytics.insights.length > 0) {
     formatted += `💡 Key Insights:\n`;
@@ -107,8 +102,6 @@ export function formatAnalytics(analytics: RizeAnalytics): string {
     });
   }
   // Metrics summary
-  if (analytics.metrics.length > 0) {
-    formatted += formatProductivityMetrics(analytics.metrics);
-  }
+  formatted += formatProductivityMetrics(analytics.metrics);
   return formatted;
 }
