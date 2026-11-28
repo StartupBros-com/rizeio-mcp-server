@@ -13,7 +13,7 @@ describe('analytics report period metrics', () => {
 
   async function report(metrics: RizeProductivityMetrics[]): Promise<string> {
     const service = new RizeApiService('test-only');
-    jest.spyOn(service, 'getSummaries').mockResolvedValue(metrics);
+    service.getSummaries = async () => metrics;
     return formatAnalytics(await service.getAnalytics('week'));
   }
 
