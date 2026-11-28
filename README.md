@@ -23,9 +23,9 @@ A production-ready, enterprise-grade MCP server that seamlessly integrates Rize.
 - **Health Monitoring**: Built-in health checks and system status reporting
 
 ### 📊 **Advanced Analytics Capabilities**
-- **Multi-Timeframe Analysis**: Day, week, month analytics with trend analysis
+- **Multi-Timeframe Analysis**: Focus time, average productivity score, and sessions for a selected day, week, or month
 - **Focus Session Intelligence**: Deep session analysis with filtering and categorization
-- **Productivity Insights**: AI-powered insights generation and pattern recognition
+- **Daily Breakdown**: See the measured metrics for each day in the selected period
 - **Project Management**: Complete project lifecycle management with metadata tracking
 - **Real-time Metrics**: Live productivity data with automated refresh intervals
 
@@ -35,7 +35,7 @@ A production-ready, enterprise-grade MCP server that seamlessly integrates Rize.
 | Tool | Purpose | Key Features |
 |------|---------|--------------|
 | `get_productivity_metrics` | Comprehensive productivity analysis | Date range filtering, category segmentation, trend analysis |
-| `get_analytics_report` | Executive-level insights | Multi-timeframe views, AI-generated insights, performance trends |
+| `get_analytics_report` | Measured period summary | Total focus time, average productivity score, focus sessions, and a daily breakdown |
 | `get_productivity_summary` | Daily performance overview | Category breakdown, context switching analysis, distraction metrics |
 
 ### **🎯 Focus Session Management** 
@@ -148,9 +148,9 @@ Claude: "Show me my productivity summary for yesterday with category breakdown"
 
 ### **Weekly Performance Analysis**  
 ```
-Claude: "Generate a weekly analytics report with AI insights"
-→ Uses get_analytics_report with timeframe="week" and includeInsights=true
-→ Returns trend analysis, productivity patterns, and actionable recommendations
+Claude: "Summarize my focus time and productivity for this week"
+→ Uses get_analytics_report with timeframe="week"
+→ Returns measured totals, the average score, and a daily breakdown when data is available
 ```
 
 ### **Project-Focused Analysis**
@@ -249,12 +249,8 @@ npm test
 4. **Comprehensive Metadata**: Rich data context that enables deeper AI analysis
 5. **Performance Optimization**: Sub-second response times for real-time AI conversations
 
-### **Advanced Analytics Intelligence**
-- **Pattern Recognition**: Identify productivity patterns and trends across time periods
-- **Predictive Insights**: AI-generated recommendations based on historical data
-- **Comparative Analysis**: Cross-project and cross-timeframe performance comparisons
-- **Behavioral Analytics**: Deep insights into work habits and focus patterns
-- **Optimization Suggestions**: Data-driven recommendations for productivity improvements
+### **Analytics Report Scope**
+`get_analytics_report` summarizes one period. It does not compare periods or generate recommendations. The `includeInsights` parameter is still accepted for compatibility; the server does not currently generate insights.
 
 ## 🚀 **Development Excellence**
 
